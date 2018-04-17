@@ -20,16 +20,16 @@ defmodule Saxy.Encoder do
     [?<, tag_name | attributes(attributes)]
   end
 
-  defp attributes([]) do
-    []
-  end
+  defp attributes([]), do: []
 
   defp attributes([{name, value} | attributes]) do
     [0x20, name, ?=, ?", value, ?", attributes(attributes)]
   end
 
-  defp contents([]) do
-    []
+  defp contents([]), do: []
+
+  defp contents([{:characters, characters} | elements]) do
+    [characters(characters) | contents(elements)]
   end
 
   defp contents([element | elements]) do
@@ -38,5 +38,9 @@ defmodule Saxy.Encoder do
 
   defp end_tag(tag_name, _other) do
     [?<, ?/, tag_name, ?>]
+  end
+
+  defp characters(characters) do
+    characters
   end
 end
