@@ -11,7 +11,7 @@ defmodule Saxy.Encoder do
     [
       start_tag(tag_name, attributes),
       ?>,
-      contents(contents),
+      content(contents),
       end_tag(tag_name, contents)
     ]
   end
@@ -26,14 +26,18 @@ defmodule Saxy.Encoder do
     [0x20, name, ?=, ?", value, ?", attributes(attributes)]
   end
 
-  defp contents([]), do: []
+  defp content([]), do: []
 
-  defp contents([{:characters, characters} | elements]) do
-    [characters(characters) | contents(elements)]
+  defp content([{:characters, characters} | elements]) do
+    [characters(characters) | content(elements)]
   end
 
-  defp contents([element | elements]) do
-    [element(element) | contents(elements)]
+  defp content([{:cdata, cdata} | elements]) do
+    [cdata(cdata) | content(elements)]
+  end
+
+  defp content([element | elements]) do
+    [element(element) | content(elements)]
   end
 
   defp end_tag(tag_name, _other) do
@@ -42,5 +46,9 @@ defmodule Saxy.Encoder do
 
   defp characters(characters) do
     characters
+  end
+
+  defp cdata(characters) do
+    ["<![CDATA[", characters | "]]>"]
   end
 end

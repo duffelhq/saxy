@@ -18,6 +18,16 @@ defmodule Saxy.EncoderTest do
     assert xml == "<person first_name=\"John\" last_name=\"Doe\">Hello my name is John Doe</person>"
   end
 
+  test "encodes CDATA" do
+    children = [
+      {:cdata, "Tom & Jerry"}
+    ]
+    document = {"person", [], children}
+    xml = Saxy.Encoder.encode(document)
+
+    assert xml == "<person><![CDATA[Tom & Jerry]]></person>"
+  end
+
   test "encodes nested element" do
     children = [
       {"address", [{"street", "foo"}, {"city", "bar"}], :empty},
