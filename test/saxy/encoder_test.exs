@@ -38,7 +38,7 @@ defmodule Saxy.EncoderTest do
     assert xml == "<movie>Tom &amp; Jerry</movie>"
   end
 
-  test "encodes references to references" do
+  test "encodes reference" do
     content = [
       {:reference, {:entity, "foo"}},
       {:reference, {:hexadecimal, ?<}},
@@ -48,6 +48,17 @@ defmodule Saxy.EncoderTest do
     xml = Saxy.Encoder.encode(document)
 
     assert xml == "<movie>&foo;&x3C;&x60;</movie>"
+  end
+
+  test "encodes comments" do
+    content = [
+      {:comment, "This is obviously a comment"},
+      {:comment, "A+, A, A-"}
+    ]
+    document = {"movie", [], content}
+    xml = Saxy.Encoder.encode(document)
+
+    assert xml == "<movie><!--This is obviously a comment--><!--A+, A, A- --></movie>"
   end
 
   test "encodes nested element" do

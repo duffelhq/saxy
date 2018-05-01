@@ -40,6 +40,10 @@ defmodule Saxy.Encoder do
     [reference(reference) | content(elements)]
   end
 
+  defp content([{:comment, comment} | elements]) do
+    [comment(comment) | content(elements)]
+  end
+
   defp content([element | elements]) do
     [element(element) | content(elements)]
   end
@@ -88,5 +92,21 @@ defmodule Saxy.Encoder do
 
   defp reference({:decimal, reference}) do
     [?&, ?x, Integer.to_string(reference, 10), ?;]
+  end
+
+  defp comment(comment) do
+    ["<!--", escape_comment(comment, comment) | "-->"]
+  end
+
+  defp escape_comment(<<?->>, original) do
+    [original, 32]
+  end
+
+  defp escape_comment(<<>>, original) do
+    original
+  end
+
+  defp escape_comment(<<_char, rest::bits>>, original) do
+    escape_comment(rest, original)
   end
 end
