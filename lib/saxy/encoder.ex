@@ -44,6 +44,10 @@ defmodule Saxy.Encoder do
     [comment(comment) | content(elements)]
   end
 
+  defp content([{:processing_instruction, name, content} | elements]) do
+    [processing_instruction(name, content) | content(elements)]
+  end
+
   defp content([element | elements]) do
     [element(element) | content(elements)]
   end
@@ -108,5 +112,9 @@ defmodule Saxy.Encoder do
 
   defp escape_comment(<<_char, rest::bits>>, original) do
     escape_comment(rest, original)
+  end
+
+  defp processing_instruction(name, content) do
+    ["<?", name, 32, content | "?>"]
   end
 end

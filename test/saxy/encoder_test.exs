@@ -61,6 +61,16 @@ defmodule Saxy.EncoderTest do
     assert xml == "<movie><!--This is obviously a comment--><!--A+, A, A- --></movie>"
   end
 
+  test "encodes processing instruction" do
+    content = [
+      {:processing_instruction, "xml-stylesheet", "type=\"text/xsl\" href=\"style.xsl\""},
+    ]
+    document = {"movie", [], content}
+    xml = Saxy.Encoder.encode(document)
+
+    assert xml == "<movie><?xml-stylesheet type=\"text/xsl\" href=\"style.xsl\"?></movie>"
+  end
+
   test "encodes nested element" do
     children = [
       {"address", [{"street", "foo"}, {"city", "bar"}], :empty},
