@@ -45,10 +45,32 @@ defmodule Saxy.Encoder do
   end
 
   defp characters(characters) do
-    characters
+    escape(characters, 0, characters)
   end
 
   defp cdata(characters) do
     ["<![CDATA[", characters | "]]>"]
+  end
+
+  @escapes [
+    {?<, "&lt;"},
+    {?>, "&gt;"},
+    {?&, "&amp;"},
+    {?", "&quot;"},
+    {?', "&apos;"}
+  ]
+
+  for {match, insert} <- @escapes do
+    defp escape(<<unquote(match), rest::bits>>, len, original) do
+      [binary_part(original, 0, len), unquote(insert) | escape(rest, 0, rest)]
+    end
+  end
+
+  defp escape(<<_, rest::bits>>, len, original) do
+    escape(rest, len + 1, original)
+  end
+
+  defp escape(<<>>, _len, original) do
+    original
   end
 end

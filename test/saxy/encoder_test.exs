@@ -28,6 +28,16 @@ defmodule Saxy.EncoderTest do
     assert xml == "<person><![CDATA[Tom & Jerry]]></person>"
   end
 
+  test "encodes characters to references" do
+    content = [
+      {:characters, "Tom & Jerry"}
+    ]
+    document = {"movie", [], content}
+    xml = Saxy.Encoder.encode(document)
+
+    assert xml == "<movie>Tom &amp; Jerry</movie>"
+  end
+
   test "encodes nested element" do
     children = [
       {"address", [{"street", "foo"}, {"city", "bar"}], :empty},
