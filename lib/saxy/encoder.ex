@@ -36,6 +36,10 @@ defmodule Saxy.Encoder do
     [cdata(cdata) | content(elements)]
   end
 
+  defp content([{:reference, reference} | elements]) do
+    [reference(reference) | content(elements)]
+  end
+
   defp content([element | elements]) do
     [element(element) | content(elements)]
   end
@@ -46,10 +50,6 @@ defmodule Saxy.Encoder do
 
   defp characters(characters) do
     escape(characters, 0, characters)
-  end
-
-  defp cdata(characters) do
-    ["<![CDATA[", characters | "]]>"]
   end
 
   @escapes [
@@ -72,5 +72,21 @@ defmodule Saxy.Encoder do
 
   defp escape(<<>>, _len, original) do
     original
+  end
+
+  defp cdata(characters) do
+    ["<![CDATA[", characters | "]]>"]
+  end
+
+  defp reference({:entity, reference}) do
+    [?&, reference, ?;]
+  end
+
+  defp reference({:hexadecimal, reference}) do
+    [?&, ?x, Integer.to_string(reference, 16), ?;]
+  end
+
+  defp reference({:decimal, reference}) do
+    [?&, ?x, Integer.to_string(reference, 10), ?;]
   end
 end
